@@ -57,10 +57,16 @@ export async function signupHandler(
     user.password = generatePassword(password);
     const savedUser = await user.save();
     const token = generateJWT(savedUser.toObject());
-    return res.status(httpStatus.OK).json({
-      message: "Registered successfully",
-      data: { token, user: savedUser },
-    });
+    const sent = await sendVerifyCodeToEmail(email);
+    if (sent)
+      return res.status(httpStatus.OK).json({
+        message: "Registered successfully",
+        data: { token, user: savedUser },
+      });
+    else
+      throw new InternalError(
+        "There was an error during sending email verification code"
+      );
   } catch (error) {
     return next(error);
   }
