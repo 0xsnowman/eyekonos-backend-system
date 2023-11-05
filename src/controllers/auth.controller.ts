@@ -24,7 +24,7 @@ export async function loginHandler(
     if (!foundUser) {
       throw new BadRequestError("User email or password is incorrect");
     }
-    if (validPassword(password, foundUser.password)) {
+    if (!validPassword(password, foundUser.password)) {
       throw new BadRequestError("User email or password is incorrect");
     }
     if (!foundUser.isVerified) {
