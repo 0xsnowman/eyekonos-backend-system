@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { User } from "../models/user.model";
 import { UserVerify } from "../models/user-verify.model";
-import { JWT_SECRET, JWT_EXPIRES_IN } from "../config";
+import { OAuthClientModel } from "../modules/oauth/model";
 import { transporter } from "../helpers/mailer";
 import {
   BadRequestError,
@@ -19,24 +18,24 @@ export async function loginHandler(
   next: NextFunction
 ) {
   const { email, password } = req.body;
-  try {
-    const foundUser = await User.findOne({ email });
-    if (!foundUser) {
-      throw new BadRequestError("User email or password is incorrect");
-    }
-    if (!validPassword(password, foundUser.password)) {
-      throw new BadRequestError("User email or password is incorrect");
-    }
-    if (!foundUser.isVerified) {
-      throw new ForbiddenError("Please Verify your email first");
-    }
-    const token = generateJWT(foundUser.toObject());
-    return res
-      .status(httpStatus.OK)
-      .json({ message: "Welcome", data: { token, user: foundUser } });
-  } catch (error) {
-    return next(error);
+  const foundUser = await User.findOne({ email });
+  if (!foundUser) {
+    throw new BadRequestError("User email or password is incorrect");
   }
+  if (!validPassword(password, foundUser.password)) {
+    throw new BadRequestError("User email or password is incorrect");
+  }
+  if (!foundUser.isVerified) {
+    throw new ForbiddenError("Please Verify your email first");
+  }
+  const oauthClient = await OAuthClientModel.findOne({ user: foundUser._id });
+  if (oauthClient) {
+    req.body.client_id = oauthClient.clientId;
+    req.body.client_secret = oauthClient.clientSecret;
+    req.body.username = email;
+    req.body.grant_type = "password";
+  }
+  return next();
 }
 
 export async function signupHandler(
@@ -56,12 +55,11 @@ export async function signupHandler(
     });
     user.password = generatePassword(password);
     const savedUser = await user.save();
-    const token = generateJWT(savedUser.toObject());
     const sent = await sendVerifyCodeToEmail(email);
     if (sent)
       return res.status(httpStatus.OK).json({
         message: "Registered successfully",
-        data: { token, user: savedUser },
+        data: { user: savedUser },
       });
     else
       throw new InternalError(
@@ -89,6 +87,14 @@ export async function verifyEmailHandler(
     }
     foundUser.isVerified = true;
     const savedUser = await foundUser.save();
+    const oauthClient = new OAuthClientModel({
+      user: foundUser._id,
+      clientId: generateString(30),
+      clientSecret: generateString(50),
+      grants: ["password", "refresh_token"],
+      redirectUris: [],
+    });
+    await oauthClient.save();
     await UserVerify.deleteOne({ token });
     return res.status(httpStatus.OK).json({
       message: "Verified email successfully",
@@ -153,11 +159,4 @@ const generatePassword = (password: string) => {
 
 const validPassword = (password: string, hashed: string) => {
   return bcrypt.compareSync(password, hashed);
-};
-
-const generateJWT = (payload: any) => {
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-    algorithm: "HS256",
-  });
 };
