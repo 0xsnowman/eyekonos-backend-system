@@ -5,11 +5,7 @@ import { User } from "../models/user.model";
 import { UserVerify } from "../models/user-verify.model";
 import { OAuthClientModel } from "../modules/oauth/model";
 import { transporter } from "../helpers/mailer";
-import {
-  BadRequestError,
-  ForbiddenError,
-  InternalError,
-} from "../core/api-error";
+import { BadRequestError, InternalError } from "../core/api-error";
 import { generateString } from "../utils/generate-string";
 
 export async function loginHandler(
@@ -20,13 +16,17 @@ export async function loginHandler(
   const { email, password } = req.body;
   const foundUser = await User.findOne({ email });
   if (!foundUser) {
-    throw new BadRequestError("User email or password is incorrect");
+    return res
+      .status(400)
+      .json({ message: "User email or password is incorrect" });
   }
   if (!validPassword(password, foundUser.password)) {
-    throw new BadRequestError("User email or password is incorrect");
+    return res
+      .status(400)
+      .json({ message: "User email or password is incorrect" });
   }
   if (!foundUser.isVerified) {
-    throw new ForbiddenError("Please Verify your email first");
+    return res.status(403).json({ message: "Please Verify your email first" });
   }
   const oauthClient = await OAuthClientModel.findOne({ user: foundUser._id });
   if (oauthClient) {
