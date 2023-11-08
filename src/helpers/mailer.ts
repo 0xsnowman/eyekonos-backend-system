@@ -1,10 +1,11 @@
 import nodemailer from "nodemailer";
+import { MAILER_HOST, MAILER_PORT, MAILER_USER, MAILER_PASS } from "../config";
 
 export const transporter = nodemailer.createTransport({
-  host: "smtp.googlemail.com",
-  port: 587,
+  host: MAILER_HOST,
+  port: Number(MAILER_PORT),
   auth: {
-    user: "chakus.superdev@gmail.com",
-    pass: "vmrsodjjhmyhaihv",
+    user: MAILER_USER,
+    pass: MAILER_PASS,
   },
 });

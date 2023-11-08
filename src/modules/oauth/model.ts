@@ -6,10 +6,10 @@ export const OAuthAccessTokenModel = mongoose.model(
   "OAuthAccessToken",
   new mongoose.Schema(
     {
-      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      client: { type: mongoose.Schema.Types.ObjectId, ref: "OAuthClient" },
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      clientId: { type: mongoose.Schema.Types.ObjectId, ref: "OAuthClient" },
       accessToken: { type: String },
-      accessTokenExpiresAt: { type: Date },
+      expires: { type: Date },
     },
     {
       timestamps: true,
@@ -22,10 +22,10 @@ export const OAuthRefreshTokenModel = mongoose.model(
   "OAuthRefreshToken",
   new mongoose.Schema(
     {
-      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      client: { type: mongoose.Schema.Types.ObjectId, ref: "OAuthClient" },
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      clientId: { type: mongoose.Schema.Types.ObjectId, ref: "OAuthClient" },
       refreshToken: { type: String },
-      refreshTokenExpiresAt: { type: Date },
+      expires: { type: Date },
     },
     {
       timestamps: true,
@@ -55,10 +55,11 @@ const getAccessToken = (accessToken: string, cb: Function) => {
   OAuthAccessTokenModel.findOne({
     accessToken: accessToken,
   })
-    .populate("user")
-    .populate("client")
+    .populate("userId")
+    .populate("clientId")
     .then((accessTokenDB) => {
-      return cb(false, accessTokenDB);
+      if (!accessTokenDB) return cb(false, false);
+      return cb(false, accessTokenDB.toObject());
     })
     .catch((err) => {
       cb(false, false);
@@ -67,10 +68,11 @@ const getAccessToken = (accessToken: string, cb: Function) => {
 
 const getRefreshToken = (refreshToken: string, cb: Function) => {
   OAuthRefreshTokenModel.findOne({ refreshToken: refreshToken })
-    .populate("user")
-    .populate("client")
+    .populate("userId")
+    .populate("clientId")
     .then((refreshTokenDB) => {
-      return cb(false, refreshTokenDB);
+      if (!refreshTokenDB) return cb(false, false);
+      return cb(false, refreshTokenDB.toObject());
     })
     .catch((err) => {
       cb(false, false);
@@ -122,10 +124,10 @@ const saveAccessToken = async (
 
   let _accessToken: any = (
     await OAuthAccessTokenModel.create({
-      user: userId,
-      client: oauthClient,
+      userId: userId,
+      clientId: oauthClient,
       accessToken: accessToken,
-      accessTokenExpiresAt: expires,
+      expires: expires,
     })
   ).toObject();
 
@@ -147,10 +149,10 @@ const saveRefreshToken = async (
 
   let _refreshToken: any = (
     await OAuthRefreshTokenModel.create({
-      user: userId,
-      client: oauthClient,
-      accessToken: refreshToken,
-      accessTokenExpiresAt: expires,
+      userId: userId,
+      clientId: oauthClient,
+      refreshToken: refreshToken,
+      expires: expires,
     })
   ).toObject();
 
