@@ -10,6 +10,42 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  settingsKey: {
+    type: String,
+    required: false,
+  },
+  newSettings: {
+    type: Array,
+    required: false,
+  },
+  tickets: {
+    type: Array,
+    required: false,
+  },
+  nftClaimed: {
+    type: Array,
+    required: false,
+  },
+  metaNfts: {
+    type: Array,
+    required: false,
+  },
+  eventsCreated: {
+    type: Array,
+    required: false,
+  },
+  eventsCollaborated: {
+    type: Array,
+    required: false,
+  },
+  eventWallet: {
+    type: String,
+    required: false,
+  },
+  lastNftEmailUpdate: {
+    type: Date,
+    default: Date.now,
+  },
   isVerified: {
     type: Boolean,
     default: false,
