@@ -1,5 +1,7 @@
 import express from "express";
 import authRoutes from "./auth.routes";
+import eventBriteRoutes from "./eventbrite.routes";
+import { oauth } from "../modules/oauth/oauth";
 
 const router = express.Router();
 
@@ -8,5 +10,7 @@ router.get("/health-check", async (req, res) => {
 });
 
 router.use("/auth", authRoutes);
+
+router.use("/eventbrite", oauth.authorise(), eventBriteRoutes);
 
 export default router;
