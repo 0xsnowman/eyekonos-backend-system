@@ -10,7 +10,11 @@ const EventsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  date: {
+  startDate: {
+    type: Date,
+    default: Date.now,
+  },
+  endDate: {
     type: Date,
     default: Date.now,
   },
@@ -18,13 +22,21 @@ const EventsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  apiKey: {
+  eventId: {
     type: String,
     required: true,
   },
-  urlSlug: {
+  eventStatus: {
     type: String,
-    default: "",
+    required: true,
+  },
+  eventUrl: {
+    type: String,
+    required: true,
+  },
+  eventResourceUrl: {
+    type: String,
+    required: true,
   },
   settings: {
     type: Array,
@@ -53,7 +65,7 @@ const EventsSchema = new mongoose.Schema({
   },
   uploadStorage: {
     type: String,
-    required: true,
+    required: false,
   },
   exclusiveUploads: {
     type: Array,

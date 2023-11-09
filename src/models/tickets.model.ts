@@ -1,7 +1,21 @@
 import mongoose from "mongoose";
 
 const TicketsSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  event: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Events",
+    required: true,
+  },
   originalTicketId: {
+    type: String,
+    required: true,
+  },
+  eventId: {
     type: String,
     required: true,
   },
@@ -14,6 +28,14 @@ const TicketsSchema = new mongoose.Schema({
     required: true,
   },
   recipientEmail: {
+    type: String,
+    required: true,
+  },
+  resourceURL: {
+    type: String,
+    required: true,
+  },
+  cost: {
     type: String,
     required: true,
   },
