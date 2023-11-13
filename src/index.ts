@@ -1,6 +1,8 @@
 import express, { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import path from "path";
+import fileUpload from "express-fileupload";
 import bodyParser from "body-parser";
 import helmet from "helmet";
 import logger from "morgan";
@@ -20,15 +22,22 @@ async function startServer() {
 
   app.use(logger("dev"));
 
-  app.use(express.json({ limit: "10mb" }));
+  app.use(express.json({ limit: "50mb" }));
   app.use(
-    express.urlencoded({ limit: "10mb", extended: true, parameterLimit: 50000 })
+    express.urlencoded({
+      limit: "50mb",
+      extended: true,
+      parameterLimit: 1000000,
+    })
   );
 
-  app.use(bodyParser.json());
+  app.use(bodyParser.json({ limit: "50mb" }));
   app.use(bodyParser.urlencoded({ extended: false }));
 
   app.use(cors({ origin: CORS_URL, optionsSuccessStatus: 200 }));
+  app.use(express.static(path.resolve(__dirname, "./public")));
+  app.use(fileUpload());
+
   app.use("/", router);
 
   app.use(helmet());
