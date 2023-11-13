@@ -9,17 +9,21 @@ const NFTSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  metadata: {
+  image: {
     type: String,
     required: true,
+  },
+  metadata: {
+    type: String,
+    default: "",
   },
   traits: {
     type: Array,
     default: [],
   },
-  image: {
+  status: {
     type: String,
-    required: true,
+    default: "meta",
   },
 });
 

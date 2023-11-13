@@ -23,12 +23,12 @@ const UserSchema = new mongoose.Schema({
     required: false,
   },
   nftClaimed: {
-    type: Array,
-    required: false,
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "NFT" }],
+    default: [],
   },
   metaNfts: {
-    type: Array,
-    required: false,
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "NFT" }],
+    default: [],
   },
   eventsCreated: {
     type: Array,
