@@ -72,6 +72,119 @@ export const createEvent = async (
   }
 };
 
+export const updateEvent = async (eventId: string, eventData: any) => {
+  try {
+    const result = await axios.post(
+      EVENTBRITE_ENDPOINTS.BASE_URI + `v3/events/${eventId}`,
+      {
+        event: eventData,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${EVENTBRITE_PRIVATE_TOKEN}`,
+        },
+      }
+    );
+    return { success: true, data: result.data };
+  } catch (err) {
+    return { success: false };
+  }
+};
+
+export const publishEvent = async (eventId: string) => {
+  try {
+    const result = await axios.post(
+      EVENTBRITE_ENDPOINTS.BASE_URI + `v3/events/${eventId}/publish`,
+      {
+        headers: {
+          Authorization: `Bearer ${EVENTBRITE_PRIVATE_TOKEN}`,
+        },
+      }
+    );
+    return { success: true, data: result.data };
+  } catch (err) {
+    return { success: false };
+  }
+};
+
+export const getEventsByStatus = async (
+  organizationId: string,
+  status: string
+) => {
+  try {
+    const result = await axios.get(
+      EVENTBRITE_ENDPOINTS.BASE_URI +
+        `v3/organizations/${organizationId}/events/?status=${status}`,
+      {
+        headers: {
+          Authorization: `Bearer ${EVENTBRITE_PRIVATE_TOKEN}`,
+        },
+      }
+    );
+    return { success: true, data: result.data };
+  } catch (err) {
+    return { success: false };
+  }
+};
+
+export const getEventsByDate = async (
+  organizationId: string,
+  timeFilter: string
+) => {
+  try {
+    const result = await axios.get(
+      EVENTBRITE_ENDPOINTS.BASE_URI +
+        `v3/organizations/${organizationId}/events/?time_filter=${timeFilter}`,
+      {
+        headers: {
+          Authorization: `Bearer ${EVENTBRITE_PRIVATE_TOKEN}`,
+        },
+      }
+    );
+    return { success: true, data: result.data };
+  } catch (err) {
+    return { success: false };
+  }
+};
+
+export const setEventSummary = async (eventId: string, description: any) => {
+  try {
+    const result = await axios.post(
+      EVENTBRITE_ENDPOINTS.BASE_URI + `v3/events/${eventId}/`,
+      {
+        event: {
+          description,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${EVENTBRITE_PRIVATE_TOKEN}`,
+        },
+      }
+    );
+    return { success: true, data: result.data };
+  } catch (err) {
+    return { success: false };
+  }
+};
+
+export const getEventDescription = async (eventId: string) => {
+  try {
+    const result = await axios.get(
+      EVENTBRITE_ENDPOINTS.BASE_URI +
+        `v3/events/${eventId}/structured_content/?purpose=listing`,
+      {
+        headers: {
+          Authorization: `Bearer ${EVENTBRITE_PRIVATE_TOKEN}`,
+        },
+      }
+    );
+    return { success: true, data: result.data };
+  } catch (err) {
+    return { success: false };
+  }
+};
+
 export const createTicketClass = async (eventId: string, config: any) => {
   try {
     const result = await axios.post(
@@ -79,6 +192,56 @@ export const createTicketClass = async (eventId: string, config: any) => {
       {
         ticket_class: config,
       },
+      {
+        headers: {
+          Authorization: `Bearer ${EVENTBRITE_PRIVATE_TOKEN}`,
+        },
+      }
+    );
+    return { success: true, data: result.data };
+  } catch (err) {
+    return { success: false };
+  }
+};
+
+export const getTicketClasses = async (eventId: string) => {
+  try {
+    const result = await axios.get(
+      EVENTBRITE_ENDPOINTS.BASE_URI +
+        `v3/events/${eventId}/?expand=ticket_classes`,
+      {
+        headers: {
+          Authorization: `Bearer ${EVENTBRITE_PRIVATE_TOKEN}`,
+        },
+      }
+    );
+    return { success: true, data: result.data };
+  } catch (err) {
+    return { success: false };
+  }
+};
+
+export const listEventOrders = async (eventId: string) => {
+  try {
+    const result = await axios.get(
+      EVENTBRITE_ENDPOINTS.BASE_URI + `v3/events/${eventId}/orders`,
+      {
+        headers: {
+          Authorization: `Bearer ${EVENTBRITE_PRIVATE_TOKEN}`,
+        },
+      }
+    );
+    return { success: true, data: result.data };
+  } catch (err) {
+    return { success: false };
+  }
+};
+
+export const getOrderAttendees = async (eventId: string) => {
+  try {
+    const result = await axios.get(
+      EVENTBRITE_ENDPOINTS.BASE_URI +
+        `v3/events/${eventId}orders/expand=attendees`,
       {
         headers: {
           Authorization: `Bearer ${EVENTBRITE_PRIVATE_TOKEN}`,
